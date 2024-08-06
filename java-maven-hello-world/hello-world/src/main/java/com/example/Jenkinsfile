@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'maven:3.8.6-jdk11' // Specify the Docker image with Maven and JDK
-            label 'docker-agent' // Optional: specify a label if needed
+            //label 'docker-agent' // Optional: specify a label if needed
         }
     }
 
