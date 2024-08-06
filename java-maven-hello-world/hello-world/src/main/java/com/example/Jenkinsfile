@@ -1,27 +1,40 @@
 pipeline {
-  agent none
-  stages {
-    stage('Back-end') {
-      agent {
-        docker { image 'maven:3.8.1-adoptopenjdk-11' }
-      }
-      steps {
-        sh 'mvn clean install'
-      }
-      
+    agent {
+        docker {
+            image 'maven:3.8.6-jdk11' // Specify the Docker image with Maven and JDK
+            label 'docker-agent' // Optional: specify a label if needed
+        }
     }
-    stage('Package'){
-      steps{
-        sh 'mvn package'
-      }
+
+    environment {
+        // You can define environment variables here if needed
+        MAVEN_OPTS = '-Xmx1024m' // Example: Increase Maven memory options
     }
-    stage('Front-end') {
-      agent {
-        docker { image 'node:16-alpine' }
-      }
-      steps {
-        sh 'node --version'
-      }
+
+    stages {
+        stage('Build and Package') {
+            steps {
+                script {
+                    // Run Maven commands inside the Docker container
+                    sh 'mvn clean install'
+                    sh 'mvn package'
+                }
+            }
+        }
     }
-  }
+
+    post {
+        always {
+            // Archive the build artifacts
+            archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+        }
+
+        success {
+            echo 'Build and packaging succeeded!'
+        }
+
+        failure {
+            echo 'Build or packaging failed.'
+        }
+    }
 }
