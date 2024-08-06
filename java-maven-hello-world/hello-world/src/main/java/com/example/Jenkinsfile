@@ -5,24 +5,33 @@ pipeline {
       agent {
         docker { image 'maven:3.8.1-adoptopenjdk-11' }
       }
-      steps {
-        sh 'mvn compile'
-      }
-      steps {
-        sh 'mvn package'
-      }
-      steps {
+    }
+      stage('Build') {
+            steps {
+                script {
+                    // Execute Maven install and package commands
+                    sh "mvn clean install"
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                script {
+                    // Package the application into a JAR file
+                    sh "mvn package"
+                }
+            }
+        }
+      
+      stage('Maven target'){
+        steps {
        sh 'java -cp target/hello-world-maven-1.0-SNAPSHOT.jar com.example.Main'
 
       }
-    }
-    stage('Front-end') {
-      agent {
-        docker { image 'node:16-alpine' }
+      
       }
-      steps {
-        sh 'node --version'
-      }
-    }
+      
+      
   }
 }
